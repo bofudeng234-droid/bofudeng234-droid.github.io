@@ -1,0 +1,37 @@
+{
+  "title": "博夫的世界 · FOOTBALL x AI",
+  "archive_bytes": 118647258,
+  "archive_sha256": "3f75aeb5178bdcced8c9798a8e946865d94dc1b81152eb37789e99b30b9eb02f",
+  "parts": [
+    {
+      "name": "site-part-001.bin",
+      "bytes": 20971520,
+      "sha256": "e692dfb85459515a973f42be923c84dc48aea3cb944f2971af5d335f44bbffc3"
+    },
+    {
+      "name": "site-part-002.bin",
+      "bytes": 20971520,
+      "sha256": "acc4a727127ad751498a55709729b07fb5f2de5f9d5cf3d7dc64a7281d9a0fac"
+    },
+    {
+      "name": "site-part-003.bin",
+      "bytes": 20971520,
+      "sha256": "fa17d71a79cf5d674f374928fa8801c975a7cdf5ec684ed722af7ac7b310faae"
+    },
+    {
+      "name": "site-part-004.bin",
+      "bytes": 20971520,
+      "sha256": "bd01df5560f9bcea0dc96289947be5d510b73100671cb334db6f6928cf233c0c"
+    },
+    {
+      "name": "site-part-005.bin",
+      "bytes": 20971520,
+      "sha256": "82d735725608b348dbbced7bd398784a20d1ab52cba1576ac2aa8e7fd6cab14a"
+    },
+    {
+      "name": "site-part-006.bin",
+      "bytes": 13789658,
+      "sha256": "5647ad32a6687976a88732600c0751c34c03b8545132a57a3c82168f404b5980"
+    }
+  ]
+}
