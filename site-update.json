@@ -1,0 +1,9 @@
+{
+  "archive": "site-update.zip",
+  "archive_bytes": 2231787,
+  "archive_sha256": "3c2daf643d6a5d3206dccd9dccda6e4f4eb6f50cbb8fc1f92173124616b24fb1",
+  "deleted_files": [
+    "assets/index-DWbAtn9x.css",
+    "assets/index-YiqTTXzy.js"
+  ]
+}
