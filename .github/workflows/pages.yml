@@ -1,0 +1,65 @@
+name: Publish 博夫的世界
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - site-manifest.json
+      - site-part-*.bin
+      - .github/workflows/pages.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+      - name: Restore complete website
+        shell: python
+        run: |
+          import hashlib, json, os, re, shutil, zipfile
+          from pathlib import Path
+          manifest = json.loads(Path('site-manifest.json').read_text())
+          archive = Path(os.environ['RUNNER_TEMP']) / 'bofu-world.zip'
+          site = Path(os.environ['RUNNER_TEMP']) / 'site'
+          with archive.open('wb') as output:
+              for part in manifest['parts']:
+                  assert re.fullmatch(r'site-part-[0-9]{3}\.bin', part['name'])
+                  path = Path(part['name'])
+                  assert path.stat().st_size == part['bytes']
+                  with path.open('rb') as data:
+                      assert hashlib.file_digest(data, 'sha256').hexdigest() == part['sha256']
+                  with path.open('rb') as data:
+                      shutil.copyfileobj(data, output)
+          assert archive.stat().st_size == manifest['archive_bytes']
+          with archive.open('rb') as data:
+              assert hashlib.file_digest(data, 'sha256').hexdigest() == manifest['archive_sha256']
+          site.mkdir()
+          with zipfile.ZipFile(archive) as package:
+              assert package.testzip() is None
+              for member in package.namelist():
+                  assert (site / member).resolve().is_relative_to(site.resolve())
+              package.extractall(site)
+          assert (site / 'index.html').is_file()
+      - name: Configure Pages
+        uses: actions/configure-pages@v6.0.0
+      - name: Upload complete website
+        uses: actions/upload-pages-artifact@v5.0.0
+        with:
+          path: ${{ runner.temp }}/site
+      - name: Deploy website
+        id: deployment
+        uses: actions/deploy-pages@v5.0.1
