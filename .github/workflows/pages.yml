@@ -6,6 +6,8 @@ on:
     paths:
       - site-manifest.json
       - site-part-*.bin
+      - site-update.zip
+      - site-update.json
       - .github/workflows/pages.yml
   workflow_dispatch:
 
@@ -31,7 +33,7 @@ jobs:
         shell: python
         run: |
           import hashlib, json, os, re, shutil, zipfile
-          from pathlib import Path
+          from pathlib import Path, PurePosixPath
           manifest = json.loads(Path('site-manifest.json').read_text())
           archive = Path(os.environ['RUNNER_TEMP']) / 'bofu-world.zip'
           site = Path(os.environ['RUNNER_TEMP']) / 'site'
@@ -53,6 +55,37 @@ jobs:
               for member in package.namelist():
                   assert (site / member).resolve().is_relative_to(site.resolve())
               package.extractall(site)
+          update_manifest = Path('site-update.json')
+          update_archive = Path('site-update.zip')
+          if update_manifest.exists() or update_archive.exists():
+              assert update_manifest.is_file() and update_archive.is_file(), 'Both update files are required'
+              update = json.loads(update_manifest.read_text())
+              assert update['archive'] == 'site-update.zip'
+              assert update_archive.stat().st_size == update['archive_bytes']
+              assert re.fullmatch(r'[0-9a-fA-F]{64}', update['archive_sha256'])
+              with update_archive.open('rb') as data:
+                  assert hashlib.file_digest(data, 'sha256').hexdigest() == update['archive_sha256'].lower()
+
+              def safe_update_path(name):
+                  assert isinstance(name, str) and name
+                  assert '\\' not in name and '\x00' not in name
+                  relative = PurePosixPath(name)
+                  assert relative.parts and not relative.is_absolute() and '..' not in relative.parts
+                  target = site.joinpath(*relative.parts)
+                  assert target.resolve().is_relative_to(site.resolve())
+                  return target
+
+              assert isinstance(update['deleted_files'], list)
+              deleted_paths = [safe_update_path(name) for name in update['deleted_files']]
+              with zipfile.ZipFile(update_archive) as patch:
+                  assert patch.testzip() is None
+                  for member in patch.namelist():
+                      safe_update_path(member)
+                  for target in deleted_paths:
+                      if target.exists():
+                          assert target.is_file(), 'Update deletions must refer to files'
+                          target.unlink()
+                  patch.extractall(site)
           assert (site / 'index.html').is_file()
       - name: Configure Pages
         uses: actions/configure-pages@v6.0.0
