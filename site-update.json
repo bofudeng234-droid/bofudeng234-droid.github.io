@@ -1,7 +1,7 @@
 {
   "archive": "site-update.zip",
-  "archive_bytes": 2232581,
-  "archive_sha256": "14ab2f4cc170bc4cbbdaf0964c62c1a11aba77dee82b6109bb501146998d55e9",
+  "archive_bytes": 2231008,
+  "archive_sha256": "32079e547fa6f0911ebaae6d98ffac4e1814d68c288974ae78116d91d0ba5d64",
   "deleted_files": [
     "assets/index-DWbAtn9x.css",
     "assets/index-YiqTTXzy.js"
